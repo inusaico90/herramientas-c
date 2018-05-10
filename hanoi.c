@@ -1,3 +1,6 @@
+/*Ejercisio que define cuantos son la cantidad minima de movimientos que se pueden realizar
+para solucionar el juego de Hanoi con x cantidad de discos definida por el usuario
+*/
 #include <stdio.h>
 int hanoi(int n){
 	if (n<=1){
