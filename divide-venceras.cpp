@@ -10,7 +10,7 @@ int compare(const void *piNuml, const void *piNum2){
 int main(void){
 	printf("Valor 1\n");
 	scanf("%ld",&iN);
-	printf("El numero de lista es:");
+	printf("El numero de lista es:\n");
 	for (i=0;i<iN;i++){
 		scanf("%ld",&aiData[i]);
 	}
