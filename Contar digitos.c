@@ -13,7 +13,6 @@ int Contador, Num2;
         }
     printf("La cantidad de digitos del Numero [%d] es = %d\n",Num2,Contador);
  }
- 
 int main(){
 int Num;
     printf("Ingresa un numero : ");
