@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define t NULL
 
-void Mostrar(int m[][t], int nf, int nc);
-void Llenar(int nc, int nf,int m[][t]);
 int Validar();
-int NumeroPositivo(int m[][t], int nf, int nc);
+void Llenar(int nc, int nf);
+void Mostrar(int nf, int nc);
+int NumeroPositivo(int nf, int nc);
 int main() {
 	
 	int fila, col;
@@ -14,20 +13,18 @@ int main() {
 	fila=Validar();
 	col=Validar();
 	
-	printf("fila: %i\ncolumna: %i\n",fila,col);
-	int Matrix[fila][t];
+	printf("fila: %d\ncolumna: %d\n",fila,col);
+	int Matrix[fila][col];
 	
-	Llenar(col,fila,Matrix);
-	Mostrar(Matrix, fila, col);
+	Llenar(col,fila);
+	Mostrar(fila, col);
 	
-	printf("El número de elementos positivos en la matriz es: %d", NumeroPositivo(Matrix, fila, col));
+	printf("El numero de elementos positivos en la matriz es: %d", NumeroPositivo(fila, col));
 	
 	return 0;
 }
-
-
-void Mostrar(int m[][t], int nf, int nc){
-	
+void Mostrar(int nf, int nc){
+	int m[nf][nc];
 	for(int i=0; i<nf; i++){
 		for(int j=0; j<nc; j++){
 			printf("[%d]\t", m[i][j]);
@@ -36,11 +33,12 @@ void Mostrar(int m[][t], int nf, int nc){
 	}	
 }
 
-void Llenar(int nc,int nf,int m[][t]){
+void Llenar(int nc,int nf){
+	int m[nf][nc];
 	for(int i=0; i<nf; i++){
 		for(int j=0; j<nc; j++){
-			printf("Digite valor para la posicion (%d,%d)", i, j);
-			scanf("%d", &m[i][j]);
+			printf("Digite valor para la posicion (%i,%i)", i, j);
+			scanf("%i", &m[i][j]);
 		}
 	}
 }
@@ -54,12 +52,12 @@ int Validar(){
 	return valor;
 }
 
-int NumeroPositivo(int m[][t], int nf, int nc){
-	
-	int cont=0;	
+int NumeroPositivo(int nf, int nc){
+	int m[nf][nc];
+	int cont=0;
 	for(int i=0; i<nf; i++){
 		for(int j=0; j<nc; j++){
-			if(m[i][j]<0){
+			if((m[i][j])>0){
 				cont++;
 			}
 		}
