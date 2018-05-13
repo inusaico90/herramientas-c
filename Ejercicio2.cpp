@@ -2,45 +2,55 @@
 #include <stdlib.h>
 
 int Validar();
-int Llenar(int nc,int nf,int j,int i);
-void Mostrar(int nf, int nc);
-int cola;
-int NumeroPositivo(int nf, int nc,int m[][6]);
+void Llenar(int **,int,int);
+void Mostrar(int, int,int **);
+int NumeroPositivo(int,int,int **);
+int **Matrix,fila,col;
 
 int main() {
-	int i,j;
-	int fila, col;
+	int varPositivos=0;
 	printf("Digite el tamaño de la matriz MxN\n");
 	fila=Validar();
 	col=Validar();
-	
-	printf("fila: %i\ncolumna: %i\n",fila,col);
-	int Matrix[fila][col];
-	for(i=0;i<=fila-1;i++){
-		for(j=0;j<=col-1;j++){
-			Matrix[i][j]=Llenar(col,fila,j,i);
-		}
+	Matrix=new int*[fila];//Reservar memoria de fila
+	for (int i=0;i<fila;i++){
+		Matrix[i]=new int[col]; //Reservar memoria columna
 	}
-	Mostrar(fila, col);
-	printf("El numero de elementos positivos en la matriz es: %d", NumeroPositivo(fila, col,&Matrix));
+	printf("fila: %i\ncolumna: %i\n",fila,col);
+	Llenar(Matrix,fila,col);
+	Mostrar(fila, col, Matrix);
+	printf("El numero de elementos positivos en la matriz es: %i", NumeroPositivo(fila,col,Matrix));
 	return 0;
 }
 
-void Mostrar(int nf, int nc){
-	int m[nf][nc];
-	for(int i=0; i<nf; i++){
-		for(int j=0; j<nc; j++){
-			printf("[%d]\t", m[i][j]);
+void Mostrar(int fila, int col,int **Matrix){
+	for(int i=0; i<fila; i++){
+		for(int j=0; j<col; j++){
+			printf("[%i]\t",Matrix[i][j]);
 		}
 		printf("\n");
-	}	
+	}
 }
 
-int Llenar(int nc,int nf,int j,int i){
-	int m[nf][nc];
-	printf("Digite valor para la posicion (%i,%i)", i, j);
-	scanf("%i",&m[i][j]);
-	return m[i][j];
+int NumeroPositivo(int fila, int col,int **Matrix){
+	int cont=0;
+	for(int i=0;i<fila;i++){
+		for(int j=0;j<col;j++){
+			if(Matrix[i][j]>0){
+				cont=cont+1;
+			}
+		}
+	}
+	return cont;
+}
+
+void Llenar(int **Matrix,int fila, int col){
+	for(int i=0;i<fila;i++){
+		for(int j=0;j<col;j++){
+			printf("Digite valor para la posicion (%i,%i)", i, j);
+			scanf("%i",&Matrix[i][j]);
+		}
+	}
 }
 
 int Validar(){
@@ -50,17 +60,4 @@ int Validar(){
 		scanf("%i", &valor);
 	}while(valor<=0);
 	return valor;
-}
-
-int NumeroPositivo(int nf, int nc,int m[][6]){
-	int cont=0;
-	for(int i=0; i<nf; i++){
-		for(int j=0; j<nc; j++){
-			printf("%i\n",*m[i]);
-			if(m[i]>0){
-				cont++;
-			}
-		}
-	}
-	return cont;
 }
