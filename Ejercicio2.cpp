@@ -5,7 +5,7 @@ int Validar();
 int Llenar(int nc,int nf,int j,int i);
 void Mostrar(int nf, int nc);
 int cola;
-int NumeroPositivo(int nf, int nc,int *m[][]);
+int NumeroPositivo(int nf, int nc,int *m[][3]);
 
 int main() {
 	int i,j;
@@ -52,7 +52,7 @@ int Validar(){
 	return valor;
 }
 
-int NumeroPositivo(int nf, int nc,int *m[][]){
+int NumeroPositivo(int nf, int nc,int *m[][3]){
 	int cont=0;
 	for(int i=0; i<nf; i++){
 		for(int j=0; j<nc; j++){
