@@ -8,8 +8,7 @@ void Mostrar(int, int,int **);
 int NumeroPositivo(int,int,int **);
 int **Matrix,fila,col;
 
-int main() {
-	int varPositivos=0;
+int main() {	
 	setlocale(LC_CTYPE,"Spanish");
 	printf("Digite el tamaño de la matriz MxN\n");
 	fila=Validar();
