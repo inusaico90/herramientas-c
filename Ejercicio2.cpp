@@ -21,6 +21,11 @@ int main() {
 	Llenar(Matrix,fila,col);
 	Mostrar(fila, col, Matrix);
 	printf("El numero de elementos positivos en la matriz es: %i", NumeroPositivo(fila,col,Matrix));
+	//Liberar memoria
+	for (int i=0;i<fila;i++){
+		delete[] Matrix[i];
+	}
+	delete[] Matrix;
 	return 0;
 }
 
