@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
 
 int Validar();
 void Llenar(int **,int,int);
@@ -9,6 +10,7 @@ int **Matrix,fila,col;
 
 int main() {
 	int varPositivos=0;
+	setlocale(LC_CTYPE,"Spanish");
 	printf("Digite el tamaño de la matriz MxN\n");
 	fila=Validar();
 	col=Validar();
