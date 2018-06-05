@@ -1,6 +1,6 @@
 /*Nombre: ajedrez en C
 creador: Kevin Erney Acosta (inusaico90)
-version: 0.1.1*/
+version: 0.1.2*/
 #include <stdio.h> //standard input-output header
 #include <stdlib.h>//Librearia estandar propositos generales
 #include <locale.h>//Librearia estandar para el analisis local del sistema
@@ -34,16 +34,16 @@ void newJugador();
 void tablero();
 void validar_mover(char *,char *);
 void inicializarVar();
-void mover(char *);
-void ubicacion(char *,int *,int *,bool,int *,int * ,bool *);
+void mover(char *prmJugador,char prmColor[]);
+void ubicacion(char *,int *,int *,bool,int *,int * ,bool *,char []);
 void guardar();
 void cargarTablero();
+void vaciar(char temp[]);
 void copiar(char temp[],int i);
 
 typedef struct{//Estructura para facilitar la declaración de los FILE
 	char lectoEscritura[100];
 }ficheros;
-void vaciar(char temp[]);
 int main(){//función principal
 	inicializarVar();//rediracción a la inicialización de variables
 	setlocale(LC_CTYPE,"Spanish");//Manejo local para que la consola imprima ñ y tildes
@@ -53,8 +53,8 @@ void reproMenu(){//función para ejecutar el menu principal
 	int varOpcion;
 	ficheros aux;FILE *menu; FILE *jugadores;FILE *juegos;ficheros temp;//Declaración de los file en donde se guardara y trabajara reporte
 	secMenu:
-	menu=fopen("menu.txt","r");jugadores=fopen("jugadores.txt","r");juegos=fopen("juegos.txt","a+");//Sincronización de los archivos a trabajar
-	
+	system(LIMPIAR);
+	menu=fopen("menu.txt","r");jugadores=fopen("jugadores.txt","r");juegos=fopen("juegos.txt","a+");//Sincronización de los archivos a trabajar	
 	while (!feof(menu)){//Imprimir menu principal
 		fgets(aux.lectoEscritura,100,menu);
 		printf("%s",aux.lectoEscritura);
@@ -65,7 +65,7 @@ void reproMenu(){//función para ejecutar el menu principal
 	system(LIMPIAR);//limpiar pantalla multi plataforma
 	switch(varOpcion){//Elección de la opción seleccionada
 		case 1:
-			cargarTablero();
+			//cargarTablero();
 			printf("\n\ningresa cualquier valor diferente a %i para salir\n",varOpcion);
 			do{
 				scanf("%i",&varOpcion);
@@ -87,7 +87,7 @@ void reproMenu(){//función para ejecutar el menu principal
 			}while(varOpcion==2);
 			system(LIMPIAR);
 			goto secMenu;
-			break;
+			break;		//creado por inusaico90 erneyjj@hotmail.es
 		case 3:
 			while(!feof(juegos)){//Impresión del historial de partidas jugadas
 				fgets(aux.lectoEscritura,100,juegos);
@@ -111,15 +111,14 @@ void reproMenu(){//función para ejecutar el menu principal
 			varOpcion=0;
 			while(!feof(juegos)){//contar cuantos partidas hay registradas
 				fgets(temp.lectoEscritura,100,juegos);
-				varOpcion++;
-			}
+				varOpcion++;}
 			rewind(juegos);//devuelvo a la posición 0 del txt
 			vaciar(temp.lectoEscritura);
-			fprintf(juegos,"\n");fprintf(juegos,"%i",varOpcion);fprintf(juegos,")");//crea el espacio de la nueva partida
+			fprintf(juegos,"\n");fprintf(juegos,"%i",varOpcion);fprintf(juegos,")\t");//crea el espacio de la nueva partida
 			for (varOpcion=0;varOpcion<2;varOpcion++){//leer nombre de los jugadores
 				printf("ingresa el nombre del jugador %i\n",varOpcion+1);
 				scanf("%s",temp.lectoEscritura);
-				fprintf(juegos,temp.lectoEscritura);fprintf(juegos,"//");
+				fprintf(juegos,temp.lectoEscritura);fprintf(juegos,"\t\t");
 			}
 			fclose(juegos);
 			tablero(mesa);//impresión en pantalla del tablero
@@ -143,32 +142,6 @@ void reproMenu(){//función para ejecutar el menu principal
 	}
 	fin:;
 }
-void cargarTablero(){
-	int i=0,j=0;char varAux='0',varTmp[33];
-	FILE *juego;
-	juego=fopen("guardar.txt","r");
-	if(juego==NULL){
-		printf("No existe partida guardada.\n");
-		goto fin;
-	}
-	//
-			  /* inicializa matriz a 0 */
-   i = 0;
-   /*while (1){
-   	if (feof(juego)){
-   		for(j=0;j<9;j++){
-   			fscan(mesa[j],"%s",&juego[j]);
-		   }
-	   }
-   }
-   fclose(juego);*/
-	tablero(mesa);
-	fin:;
-}
-void copiar(char temp[],int i){
-	int N= strlen(temp)+1;
-	strcpy(mesa[i],temp);
-}
 void vaciar(char temp[]){//limpia lo que contenga el string
 	int i;
 	for(i=0;i<100;i++){
@@ -185,13 +158,13 @@ void newJugador(){//Función para la creación de un nuevo jugador
 	jugador=fopen("jugadores.txt","a");fprintf(jugador,"\n");
 	printf("Ingresa el nombre del nuevo jugador\n");
 	scanf("%s",name.lectoEscritura);
-	fprintf(jugador,name.lectoEscritura);fprintf(jugador,"//");
+	fprintf(jugador,name.lectoEscritura);fprintf(jugador,"\t");
 	printf("Ingrese el nick del nuevo jugador\n");
 	scanf("%s",nick.lectoEscritura);
-	fprintf(jugador,nick.lectoEscritura);fprintf(jugador,"//");
+	fprintf(jugador,nick.lectoEscritura);fprintf(jugador,"\t");
 	printf("Ingresa el correo del nuevo jugador\n");
 	scanf("%s",nick.lectoEscritura);
-	fprintf(jugador,nick.lectoEscritura);fprintf(jugador,"//");
+	fprintf(jugador,nick.lectoEscritura);fprintf(jugador,"\t\t");
 	//capturar fecha y hora además de guardarla en el archivo
 	tiempo = time(0);
 	timelocal = localtime(&tiempo);
@@ -220,55 +193,238 @@ void inicializarVar(){//función para inicializar todas la variables
 	//Fin creación
 }
 void validar_mover(char prmColor[],char prmJugador[4]){//función para empezar movimientos
-		int varOpcion;FILE *juegos;juegos=fopen("juegos.txt","a+");
 		printf("Jugador %s elije la ficha a mover:\n",prmColor);//Impresión de a quien le corresponde el turno
 		scanf("%s",prmJugador);
-		if(strcmp(prmJugador,"gua")==0 || strcmp(prmJugador,"sal")==0 || strcmp(prmJugador,"ren")==0){
-			if (strcmp(prmJugador,"gua")==0){
-				varOpcion=0;
+		mover(prmJugador,prmColor);//Redirección a la función para realizar el movimiento
+		varJugador=!varJugador;//cambio de estado para permitir el cambio de jugador
+}
+void mover(char *prmJugador,char prmColor[]){//función para validar el movimiento
+	int varx=-1,varY=-1,auxx,auxy;
+	char varAux[2];
+	bool varEsValido;varEsValido=false;
+	
+	FILE *juegos;juegos=fopen("juegos.txt","a+");int varOpcion;
+	if(strcmp(prmJugador,"gua")==0 || strcmp(prmJugador,"sal")==0 || strcmp(prmJugador,"ren")==0){
+		if (strcmp(prmJugador,"gua")==0){
+			varOpcion=0;
+		}
+		if (strcmp(prmJugador,"sal")==0){
+			varOpcion=1;
+		}
+		if (strcmp(prmJugador,"ren")==0){
+			varOpcion=2;
+		}
+		switch(varOpcion){
+			case 0:
+				printf("Guardando juego\n");
+				guardar();
+				fprintf(juegos,"Juego guardado");
+				break;
+			case 1:
+				printf("cancelando juego");
+				fprintf(juegos,"Juego cancelado");
+				break;
+			case 2:
+				printf("Se ha rendido el jugador %s",prmColor);
+				if(prmColor[0]=='1'){
+					fprintf(juegos,"gana j2");
+				}else{
+					fprintf(juegos,"gana j1");
+				}
+				printf("\n\ningresa cualquier valor diferente a %i para salir\n",varOpcion);
+				do{
+					scanf("%i",&varOpcion);
+				}while(varOpcion==2);
+				system(LIMPIAR);
+				break;
+			default:
+				printf("el pendejo del programador la cago");
+				break;
 			}
-			if (strcmp(prmJugador,"sal")==0){
-				varOpcion=1;
+		fclose(juegos);
+		varPartida=false;
+		system(LIMPIAR);
+	}
+	else{
+		ubicacion(prmJugador,&varx,&varY,true,&auxx,&auxy,&varEsValido,prmColor);//confirmación de la ubicación de la ficha
+		printf("Haz elejido el %c%c\n",mesa[varY][varx],mesa[varY][varx+1]);
+		varAux[0]=mesa[varY][varx];varAux[1]=mesa[varY][varx+1];//creación de copia de la variable en caso de selección final invalida
+		printf("Elije en donde quieres poner la ficha\n");
+		scanf("%s",prmJugador);
+		ubicacion(prmJugador,&varx,&varY,false,&auxx,&auxy,&varEsValido,prmColor);//confirmación de la ubicación a poner
+		if (varEsValido){//si es valido el movimiento se guardaran los cambios
+			mesa[varY][varx]=varAux[0];
+			mesa[varY][varx+1]=varAux[1];}
+		tablero(mesa);//impresión del tablero
+	}
+}
+void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int *prmauxy,bool *prmEsValido, char prmColor[]){//validar ficha de movimiento
+	char aux[2];
+	strcat(aux,"");
+	FILE *juegos;juegos=fopen("juegos.txt","a+");int varOpcion;
+	if(strcmp(prmJugador,"gua")==0 || strcmp(prmJugador,"sal")==0 || strcmp(prmJugador,"ren")==0){
+		if (strcmp(prmJugador,"gua")==0){
+			varOpcion=0;
+		}
+		if (strcmp(prmJugador,"sal")==0){
+			varOpcion=1;
+		}
+		if (strcmp(prmJugador,"ren")==0){
+			varOpcion=2;
+		}
+		switch(varOpcion){
+			case 0:
+				printf("Guardando juego\n");
+				guardar();
+				fprintf(juegos,"Juego guardado");
+				break;
+			case 1:
+				printf("cancelando juego");
+				fprintf(juegos,"Juego cancelado");
+				break;
+			case 2:
+				printf("Se ha rendido el jugador %s",prmColor);
+				if(prmColor[0]=='1'){
+					fprintf(juegos,"gana j2");
+				}else{
+					fprintf(juegos,"gana j1");
+				}
+				printf("\n\ningresa cualquier valor diferente a %i para salir\n",varOpcion);
+				do{
+					scanf("%i",&varOpcion);
+				}while(varOpcion==2);
+				system(LIMPIAR);
+				break;
+			default:
+				printf("el pendejo del programador la cago");
+				break;
 			}
-			if (strcmp(prmJugador,"ren")==0){
-				varOpcion=2;
+		fclose(juegos);
+		varPartida=false;
+		system(LIMPIAR);
+	}
+	else{
+		if(!prmMov){
+			aux[0]=mesa[*prmy][*prmx];
+			aux[1]=mesa[*prmy][*prmx+1];
+			mesa[*prmy][*prmx]=' ';
+			mesa[*prmy][*prmx+1]=' ';
+		}
+		switch(prmJugador[0]){
+			case 'a':
+				*prmx=1;
+				break;
+			case 'b':
+				*prmx=5;
+				break;
+			case 'c':
+				*prmx=9;
+				break;
+			case 'd':
+				*prmx=13;
+				break;
+			case 'e':
+				*prmx=17;
+				break;
+			case 'f':
+				*prmx=21;
+				break;
+			case 'g':
+				*prmx=25;
+				break;
+			case 'h':
+				*prmx=29;
+				break;
+			default:
+				if(!prmEsValido){
+					mesa[*prmauxy][*prmauxx]=aux[0];
+				}
+				printf("Letra invalida\n");
+				break;
+		}
+		switch(prmJugador[1]){
+			case '1':
+				*prmy=7;
+				break;
+			case '2':
+				*prmy=6;
+				break;
+			case '3':
+				*prmy=5;
+				break;
+			case '4':
+				*prmy=4;
+				break;
+			case '5':
+				*prmy=3;
+				break;
+			case '6':
+				*prmy=2;
+				break;
+			case '7':
+				*prmy=1;
+				break;
+			case '8':
+				*prmy=0;
+				break;
+			default:
+				if(!prmEsValido){
+					mesa[*prmauxy][*prmauxx]=aux[0];
+					mesa[*prmauxy][*prmauxx+1]=aux[1];
+				}
+				printf("número no valido\n");
+				break;
+		}
+		if((varJugador&&mesa[*prmy][*prmx+1]=='n')||(!varJugador&&mesa[*prmy][*prmx+1]=='b') ){
+			goto parte2;
+		}
+		if(*prmx==-1||*prmy==-1||((mesa[*prmy][*prmx]==' ')*prmMov)||((mesa[*prmy][*prmx]!=' ')*(!prmMov))){
+			parte2:
+			printf("Selecciona una opción valida\n");
+			if (!prmEsValido){
+				mesa[*prmauxy][*prmauxx]=aux[0];
+				mesa[*prmauxy][*prmauxx+1]=aux[1];
 			}
-			switch(varOpcion){
-				case 0:
-					printf("Guardando juego\n");
-					guardar();
-					fprintf(juegos,"Juego guardado");
-					break;
-				case 1:
-					printf("cancelando juego");
-					fprintf(juegos,"Juego cancelado");
-					break;
-				case 2:
-					printf("Se ha rendido el jugador %s",prmColor);
-					if(prmColor[0]=='1'){
-						fprintf(juegos,"gana j2");
-					}else{
-						fprintf(juegos,"gana j1");
-					}
-					printf("\n\ningresa cualquier valor diferente a %i para salir\n",varOpcion);
-					do{
-						scanf("%i",&varOpcion);
-					}while(varOpcion==2);
-					system(LIMPIAR);
-					break;
-				default:
-					printf("el pendejo del programador la cago");
-					break;
+			*prmEsValido=false;
+			if(varJugador){
+				validar_mover("1(blanca)",varJugador1);
 			}
-			fclose(juegos);
-			varPartida=false;
-			system(LIMPIAR);
+			else{
+				validar_mover("2(negra)",varJugador2);
+			}
 		}
 		else{
-			mover(prmJugador);//Redirección a la función para realizar el movimiento
-			varJugador=!varJugador;//cambio de estado para permitir el cambio de jugador
+			if(prmMov){
+				*prmEsValido=true;
+				*prmauxx=*prmx;
+				*prmauxy=*prmy;
+			}
 		}
+	}
 }
+/*void cargarTablero(){
+	int aux,aux2;aux=0;aux2=0;char temp[33];ficheros varTemp;
+	FILE *juego;
+	juego=fopen("guardar.txt","r");
+	if(juego==NULL){
+		printf("Error al abrir el archivo");
+	}	
+	for (aux=0;!feof(juego);aux++){
+		strcat(temp,'0');
+		for(aux2=0;temp!='\n';aux2++){
+			temp=fgetc(juego);
+			if(temp!='\n'){
+				varTemp.lectoEscritura[aux2]=temp
+			}
+		}
+		copiar(varTemp.lectoEscritura,aux);
+	}
+	fclose(nGuardado);
+}
+/*void copiar(char temp[],int i){
+	int N = strlen(temp)+1;
+	strcpy(mesa[i],temp);
+}*/
 void guardar(){
 	int aux,aux2;aux=0;aux2=0;
 	FILE *nGuardado;FILE *partida;
@@ -286,121 +442,6 @@ void guardar(){
 		}
 	}
 	fclose(nGuardado);
-}
-void mover(char *prmJugador){//función para validar el movimiento
-	int varx=-1,varY=-1,auxx,auxy;
-	char varAux[2];
-	bool varEsValido;varEsValido=false;
-	ubicacion(prmJugador,&varx,&varY,true,&auxx,&auxy,&varEsValido);//confirmación de la ubicación de la ficha
-	printf("Haz elejido el %c%c\n",mesa[varY][varx],mesa[varY][varx+1]);
-	varAux[0]=mesa[varY][varx];varAux[1]=mesa[varY][varx+1];//creación de copia de la variable en caso de selección final invalida
-	printf("Elije en donde quieres poner la ficha\n");
-	scanf("%s",prmJugador);
-	ubicacion(prmJugador,&varx,&varY,false,&auxx,&auxy,&varEsValido);//confirmación de la ubicación a poner
-	if (varEsValido){//si es valido el movimiento se guardaran los cambios
-	mesa[varY][varx]=varAux[0];
-	mesa[varY][varx+1]=varAux[1];}
-	tablero(mesa);//impresión del 
-}
-void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int *prmauxy,bool *prmEsValido){//validar ficha de movimiento
-	char aux[2];
-	strcat(aux,"");
-	if(!prmMov){
-		aux[0]=mesa[*prmy][*prmx];
-		aux[1]=mesa[*prmy][*prmx+1];
-		mesa[*prmy][*prmx]=' ';
-		mesa[*prmy][*prmx+1]=' ';
-		}
-	switch(prmJugador[0]){
-		case 'a':
-			*prmx=1;
-			break;
-		case 'b':
-			*prmx=5;
-			break;
-		case 'c':
-			*prmx=9;
-			break;
-		case 'd':
-			*prmx=13;
-			break;
-		case 'e':
-			*prmx=17;
-			break;
-		case 'f':
-			*prmx=21;
-			break;
-		case 'g':
-			*prmx=25;
-			break;
-		case 'h':
-			*prmx=29;
-			break;
-		default:
-			if(!prmEsValido){
-				mesa[*prmauxy][*prmauxx]=aux[0];
-			}
-			printf("Letra invalida\n");
-			break;
-	}
-	switch(prmJugador[1]){
-		case '1':
-			*prmy=7;
-			break;
-		case '2':
-			*prmy=6;
-			break;
-		case '3':
-			*prmy=5;
-			break;
-		case '4':
-			*prmy=4;
-			break;
-		case '5':
-			*prmy=3;
-			break;
-		case '6':
-			*prmy=2;
-			break;
-		case '7':
-			*prmy=1;
-			break;
-		case '8':
-			*prmy=0;
-			break;
-		default:
-			if(!prmEsValido){
-			mesa[*prmauxy][*prmauxx]=aux[0];
-			mesa[*prmauxy][*prmauxx+1]=aux[1];
-			}
-			printf("número no valido\n");
-			break;
-	}
-	if((varJugador&&mesa[*prmy][*prmx+1]=='n')||(!varJugador&&mesa[*prmy][*prmx+1]=='b') ){
-		goto parte2;
-	}
-	if(*prmx==-1||*prmy==-1||((mesa[*prmy][*prmx]==' ')*prmMov)||((mesa[*prmy][*prmx]!=' ')*(!prmMov))){
-		parte2:
-		printf("Selecciona una opción valida\n");
-		if (!prmEsValido){
-			mesa[*prmauxy][*prmauxx]=aux[0];
-			mesa[*prmauxy][*prmauxx+1]=aux[1];
-		}
-		*prmEsValido=false;
-		if(varJugador){
-			validar_mover("1(blanca)",varJugador1);
-		}
-		else{
-			validar_mover("2(negra)",varJugador2);
-		}
-	}
-	else{
-		if(prmMov){
-		*prmEsValido=true;
-		*prmauxx=*prmx;
-		*prmauxy=*prmy;
-		}
-	}
 }
 void tablero(char prmM[][33]){//imrpimir tablero
 	system(LIMPIAR);
@@ -435,7 +476,7 @@ void tablero(char prmM[][33]){//imrpimir tablero
 					printf("\t    mover (ej:b2) y después la ubicación a donde lo quieres mover(ej:b3)");
 					break;
 				case 8:
-					printf("\t    >Escribe gua, para guardar la partida, sal para cancelar partida y ren para rendirce");
+					printf("\t    >Escribe gua, para guardar el juego, sal para cancelar partida y ren para rendirse");
 					break;
 				break;
 				defult:
