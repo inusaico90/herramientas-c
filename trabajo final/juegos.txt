@@ -1,0 +1,16 @@
+#	jugador1	jugador2	estado
+1)	kevinsdf	inusaico90	gana j2
+2)	kev		lev		
+3)	kevin		elvas		
+4)	kev		levi		Juego cancelado
+5)	kev		las		Juego cancelado
+6)	kev		lev		Juego canceladoJuego cancelado
+7)	kev		lev		Juego canceladoJuego cancelado
+8)	kev		lev		Juego canceladoJuego cancelado
+9)	kev		lev		Juego canceladoJuego cancelado
+10)	lev		as		Juego cancelado
+11)	kev		lev		Juego cancelado
+12)	kev		lev		Juego canceladoJuego cancelado
+13)	kev		lev		Juego canceladoJuego canceladoJuego cancelado
+14)	ke		lev		Juego cancelado
+15)	c1		c2		Juego cancelado

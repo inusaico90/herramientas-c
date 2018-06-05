@@ -1,0 +1,8 @@
+****************BIENVENIDO A C.AJEDREZ****************			   /////NOTA\\\\\
+*  Oprime 1 cargar ultima partida guardada	     *		En caso de empezar nuevo juego con
+*  Oprime 2 para ver los jugadores registrados	     *		jugadores no registrados no se  
+*  Oprime 3 para ver los anteriores resultados	     *		guardara el historial privado.
+*  Oprime 4 para crear un nuevo jugador		     *     	
+*  Oprime 5 para jugar una nueva partida	     *
+*  Oprime 6 para salir				     *
+****************CREADO POR INUSAICO90******************
