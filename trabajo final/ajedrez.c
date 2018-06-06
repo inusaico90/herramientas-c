@@ -1,6 +1,6 @@
 /*Nombre: ajedrez en C
 creador: Kevin Erney Acosta (inusaico90)
-version: 0.1.2*/
+version: 0.1.3*/
 #include <stdio.h> //standard input-output header
 #include <stdlib.h>//Librearia estandar propositos generales
 #include <locale.h>//Librearia estandar para el analisis local del sistema
@@ -193,10 +193,54 @@ void inicializarVar(){//función para inicializar todas la variables
 	//Fin creación
 }
 void validar_mover(char prmColor[],char prmJugador[4]){//función para empezar movimientos
-		printf("Jugador %s elije la ficha a mover:\n",prmColor);//Impresión de a quien le corresponde el turno
-		scanf("%s",prmJugador);
+	printf("Jugador %s elije la ficha a mover:\n",prmColor);//Impresión de a quien le corresponde el turno
+	scanf("%s",prmJugador);
+	FILE *juegos;juegos=fopen("juegos.txt","a+");int varOpcion;
+	if(strcmp(prmJugador,"gua")==0 || strcmp(prmJugador,"sal")==0 || strcmp(prmJugador,"ren")==0){
+		if (strcmp(prmJugador,"gua")==0){
+			varOpcion=0;
+		}
+		if (strcmp(prmJugador,"sal")==0){
+			varOpcion=1;
+		}
+		if (strcmp(prmJugador,"ren")==0){
+			varOpcion=2;
+		}
+		switch(varOpcion){
+			case 0:
+				printf("Guardando juego\n");
+				guardar();
+				fprintf(juegos,"Juego guardado");
+				break;
+			case 1:
+				printf("cancelando juego");
+				fprintf(juegos,"Juego cancelado");
+				break;
+			case 2:
+				printf("Se ha rendido el jugador %s",prmColor);
+				if(prmColor[0]=='1'){
+					fprintf(juegos,"gana j2");
+				}else{
+					fprintf(juegos,"gana j1");
+				}
+				printf("\n\ningresa cualquier valor diferente a %i para salir\n",varOpcion);
+				do{
+					scanf("%i",&varOpcion);
+				}while(varOpcion==2);
+				system(LIMPIAR);
+				break;
+			default:
+				printf("el pendejo del programador la cago");
+				break;
+			}
+		fclose(juegos);
+		varPartida=false;
+		system(LIMPIAR);
+	}
+	else{
 		mover(prmJugador,prmColor);//Redirección a la función para realizar el movimiento
 		varJugador=!varJugador;//cambio de estado para permitir el cambio de jugador
+	}
 }
 void mover(char *prmJugador,char prmColor[]){//función para validar el movimiento
 	int varx=-1,varY=-1,auxx,auxy;
@@ -256,7 +300,7 @@ void mover(char *prmJugador,char prmColor[]){//función para validar el movimient
 			mesa[varY][varx]=varAux[0];
 			mesa[varY][varx+1]=varAux[1];}
 		tablero(mesa);//impresión del tablero
-	}
+		}
 }
 void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int *prmauxy,bool *prmEsValido, char prmColor[]){//validar ficha de movimiento
 	char aux[2];
@@ -378,10 +422,39 @@ void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int
 		if((varJugador&&mesa[*prmy][*prmx+1]=='n')||(!varJugador&&mesa[*prmy][*prmx+1]=='b') ){
 			goto parte2;
 		}
+		if(!prmMov){
+			switch(aux[0]){
+				case 'a':
+					
+					break;
+				case 'c':
+					
+					break;
+				case 't':
+					
+					break;
+				case 'd':
+					
+					break;
+				case 'r':
+					
+					break;
+				case 'p':
+					if(((*prmauxy-1==*prmy&&*prmauxx==*prmx)||(*prmauxy-1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-3))&&(prmJugador[0]=='1'))||((*prmauxy+1==*prmy&&*prmauxx==*prmx)||(*prmauxy+1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-3))&&(prmJugador[0]=='2'))){
+						goto parte3;
+					}
+					else{
+						goto parte2;
+					}
+					break;
+				default:
+					break;
+			}
+		}
 		if(*prmx==-1||*prmy==-1||((mesa[*prmy][*prmx]==' ')*prmMov)||((mesa[*prmy][*prmx]!=' ')*(!prmMov))){
 			parte2:
 			printf("Selecciona una opción valida\n");
-			if (!prmEsValido){
+			if ((!prmEsValido&&prmJugador[0]=='1')||(prmEsValido&&prmJugador[0]=='2')){
 				mesa[*prmauxy][*prmauxx]=aux[0];
 				mesa[*prmauxy][*prmauxx+1]=aux[1];
 			}
@@ -394,6 +467,7 @@ void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int
 			}
 		}
 		else{
+			parte3:
 			if(prmMov){
 				*prmEsValido=true;
 				*prmauxx=*prmx;
@@ -402,29 +476,6 @@ void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int
 		}
 	}
 }
-/*void cargarTablero(){
-	int aux,aux2;aux=0;aux2=0;char temp[33];ficheros varTemp;
-	FILE *juego;
-	juego=fopen("guardar.txt","r");
-	if(juego==NULL){
-		printf("Error al abrir el archivo");
-	}	
-	for (aux=0;!feof(juego);aux++){
-		strcat(temp,'0');
-		for(aux2=0;temp!='\n';aux2++){
-			temp=fgetc(juego);
-			if(temp!='\n'){
-				varTemp.lectoEscritura[aux2]=temp
-			}
-		}
-		copiar(varTemp.lectoEscritura,aux);
-	}
-	fclose(nGuardado);
-}
-/*void copiar(char temp[],int i){
-	int N = strlen(temp)+1;
-	strcpy(mesa[i],temp);
-}*/
 void guardar(){
 	int aux,aux2;aux=0;aux2=0;
 	FILE *nGuardado;FILE *partida;
@@ -484,3 +535,26 @@ void tablero(char prmM[][33]){//imrpimir tablero
 		printf("\n");
 	}
 }
+/*void cargarTablero(){
+	int aux,aux2;aux=0;aux2=0;char temp[33];ficheros varTemp;
+	FILE *juego;
+	juego=fopen("guardar.txt","r");
+	if(juego==NULL){
+		printf("Error al abrir el archivo");
+	}	
+	for (aux=0;!feof(juego);aux++){
+		strcat(temp,'0');
+		for(aux2=0;temp!='\n';aux2++){
+			temp=fgetc(juego);
+			if(temp!='\n'){
+				varTemp.lectoEscritura[aux2]=temp
+			}
+		}
+		copiar(varTemp.lectoEscritura,aux);
+	}
+	fclose(nGuardado);
+}
+/*void copiar(char temp[],int i){
+	int N = strlen(temp)+1;
+	strcpy(mesa[i],temp);
+}*/
