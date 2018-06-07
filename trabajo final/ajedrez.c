@@ -1,6 +1,6 @@
 /*Nombre: ajedrez en C
 creador: Kevin Erney Acosta (inusaico90)
-version: 0.1.3*/
+version: 0.1.7*/
 #include <stdio.h> //standard input-output header
 #include <stdlib.h>//Librearia estandar propositos generales
 #include <locale.h>//Librearia estandar para el analisis local del sistema
@@ -40,6 +40,7 @@ void guardar();
 void cargarTablero();
 void vaciar(char temp[]);
 void copiar(char temp[],int i);
+bool validarLibre(int actux, int actuy, int nuevx, int nuevy,char ficha);
 
 typedef struct{//Estructura para facilitar la declaración de los FILE
 	char lectoEscritura[100];
@@ -297,7 +298,7 @@ void mover(char *prmJugador,char prmColor[]){//función para validar el movimient
 		}
 }
 void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int *prmauxy,bool *prmEsValido, char prmColor[]){//validar ficha de movimiento
-	char aux[2];
+	char aux[2];bool varEsLibre;
 	strcat(aux,"");
 	FILE *juegos;juegos=fopen("juegos.txt","a+");int varOpcion;
 	if(strcmp(prmJugador,"gua")==0 || strcmp(prmJugador,"sal")==0 || strcmp(prmJugador,"ren")==0){
@@ -405,15 +406,9 @@ void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int
 				printf("número no valido\n");
 				break;
 		}
+		
 		if((varJugador&&mesa[*prmy][*prmx+1]=='n')||(!varJugador&&mesa[*prmy][*prmx+1]=='b')){
-			if(!prmEsValido){
-				if((mesa[*prmy][*prmx+1]==mesa[*prmauxy][*prmauxx+1])&&(*prmauxy==-1||*prmauxx==-1)){
 					goto parte2;
-				}
-			}
-			else{
-				goto conti;
-			}
 		}
 		conti:
 		if(aux[1]==mesa[*prmy][*prmx+1]){
@@ -421,9 +416,10 @@ void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int
 		}
 		else{
 			if(!prmMov){
+				varEsLibre=validarLibre(*prmauxx,*prmauxy,*prmx,*prmy,aux[0]);
 				switch(aux[0]){
 					case 'a':
-						if((/*cond1*/*prmauxy-1==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond2*/*prmauxy-2==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond3*/*prmauxy-3==*prmy&&(*prmauxx+12==*prmx||*prmauxx-12==*prmx)) || (/*cond4*/*prmauxy-4==*prmy&&(*prmauxx+16==*prmx||*prmauxx-16==*prmx)) || (/*cond5*/*prmauxy-5==*prmy&&(*prmauxx+20==*prmx||*prmauxx-20==*prmx)) || (/*cond6*/*prmauxy+1==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond7*/*prmauxy+2==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond8*/*prmauxy+3==*prmy&&(*prmauxx+12==*prmx||*prmauxx-12==*prmx)) || (/*cond9*/*prmauxy+4==*prmy&&(*prmauxx+16==*prmx||*prmauxx-16==*prmx)) || (/*cond10*/*prmauxy+5==*prmy&&(*prmauxx+20==*prmx||*prmauxx-20==*prmx))){
+						if(((/*cond1*/*prmauxy-1==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond2*/*prmauxy-2==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond3*/*prmauxy-3==*prmy&&(*prmauxx+12==*prmx||*prmauxx-12==*prmx)) || (/*cond4*/*prmauxy-4==*prmy&&(*prmauxx+16==*prmx||*prmauxx-16==*prmx)) || (/*cond5*/*prmauxy-5==*prmy&&(*prmauxx+20==*prmx||*prmauxx-20==*prmx)) || (/*cond6*/*prmauxy+1==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond7*/*prmauxy+2==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond8*/*prmauxy+3==*prmy&&(*prmauxx+12==*prmx||*prmauxx-12==*prmx)) || (/*cond9*/*prmauxy+4==*prmy&&(*prmauxx+16==*prmx||*prmauxx-16==*prmx)) || (/*cond10*/*prmauxy+5==*prmy&&(*prmauxx+20==*prmx||*prmauxx-20==*prmx)))&&varEsLibre){
 							goto parte3;
 						}
 						else{
@@ -431,7 +427,7 @@ void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int
 						}
 						break;
 					case 'c':
-						if( (/*cond1*/*prmauxy-2==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond2*/*prmauxy-1==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond3*/*prmauxy+2==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond4*/*prmauxy+1==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) ){
+						if((/*cond1*/*prmauxy-2==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond2*/*prmauxy-1==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond3*/*prmauxy+2==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond4*/*prmauxy+1==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx))){
 							goto parte3;
 						}
 						else{
@@ -439,7 +435,7 @@ void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int
 						}
 						break;
 					case 't':
-						if((/*cond1*/(*prmauxy-1==*prmy||*prmauxy-2==*prmy||*prmauxy-3==*prmy||*prmauxy-4==*prmy||*prmauxy-5==*prmy||*prmauxy-6==*prmy||*prmauxy-7==*prmy)&&*prmauxx==*prmx) || (/*cond2*/(*prmauxx-4==*prmx||*prmauxx-8==*prmx||*prmauxx-12==*prmx||*prmauxx-16==*prmx||*prmauxx-20==*prmx||*prmauxx-24==*prmx||*prmauxx-28==*prmx)&&*prmauxy==*prmy)||((*prmauxy+1==*prmy||*prmauxy+2==*prmy||*prmauxy+3==*prmy||*prmauxy+4==*prmy||*prmauxy+5==*prmy||*prmauxy+6==*prmy||*prmauxy+7==*prmy)&&*prmauxx==*prmx)||((*prmauxx+4==*prmx||*prmauxx+8==*prmx||*prmauxx+12==*prmx||*prmauxy+16==*prmx||*prmauxx+20==*prmx||*prmauxx+24==*prmx||*prmauxx+28==*prmx)&&*prmauxy==*prmy)){
+						if(((/*cond1*/(*prmauxy-1==*prmy||*prmauxy-2==*prmy||*prmauxy-3==*prmy||*prmauxy-4==*prmy||*prmauxy-5==*prmy||*prmauxy-6==*prmy||*prmauxy-7==*prmy)&&*prmauxx==*prmx) || (/*cond2*/(*prmauxx-4==*prmx||*prmauxx-8==*prmx||*prmauxx-12==*prmx||*prmauxx-16==*prmx||*prmauxx-20==*prmx||*prmauxx-24==*prmx||*prmauxx-28==*prmx)&&*prmauxy==*prmy)||((*prmauxy+1==*prmy||*prmauxy+2==*prmy||*prmauxy+3==*prmy||*prmauxy+4==*prmy||*prmauxy+5==*prmy||*prmauxy+6==*prmy||*prmauxy+7==*prmy)&&*prmauxx==*prmx)||((*prmauxx+4==*prmx||*prmauxx+8==*prmx||*prmauxx+12==*prmx||*prmauxy+16==*prmx||*prmauxx+20==*prmx||*prmauxx+24==*prmx||*prmauxx+28==*prmx)&&*prmauxy==*prmy))&&varEsLibre){
 							goto parte3;
 						}
 						else{
@@ -447,21 +443,21 @@ void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int
 						}
 						break;
 					case 'd':
-						if((/*cond1*/*prmauxy-1==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond2*/*prmauxy-2==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond3*/*prmauxy-3==*prmy&&(*prmauxx+12==*prmx||*prmauxx-12==*prmx)) || (/*cond4*/*prmauxy-4==*prmy&&(*prmauxx+16==*prmx||*prmauxx-16==*prmx)) || (/*cond5*/*prmauxy-5==*prmy&&(*prmauxx+20==*prmx||*prmauxx-20==*prmx)) || (/*cond6*/*prmauxy+1==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond7*/*prmauxy+2==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond8*/*prmauxy+3==*prmy&&(*prmauxx+12==*prmx||*prmauxx-12==*prmx)) || (/*cond9*/*prmauxy+4==*prmy&&(*prmauxx+16==*prmx||*prmauxx-16==*prmx)) || (/*cond10*/*prmauxy+5==*prmy&&(*prmauxx+20==*prmx||*prmauxx-20==*prmx)) || (/*cond11*/(*prmauxy-1==*prmy||*prmauxy-2==*prmy||*prmauxy-3==*prmy||*prmauxy-4==*prmy||*prmauxy-5==*prmy||*prmauxy-6==*prmy||*prmauxy-7==*prmy)&&*prmauxx==*prmx) || (/*cond12*/(*prmauxx-4==*prmx||*prmauxx-8==*prmx||*prmauxx-12==*prmx||*prmauxx-16==*prmx||*prmauxx-20==*prmx||*prmauxx-24==*prmx||*prmauxx-28==*prmx)&&*prmauxy==*prmy)||((*prmauxy+1==*prmy||*prmauxy+2==*prmy||*prmauxy+3==*prmy||*prmauxy+4==*prmy||*prmauxy+5==*prmy||*prmauxy+6==*prmy||*prmauxy+7==*prmy)&&*prmauxx==*prmx)||((*prmauxx+4==*prmx||*prmauxx+8==*prmx||*prmauxx+12==*prmx||*prmauxy+16==*prmx||*prmauxx+20==*prmx||*prmauxx+24==*prmx||*prmauxx+28==*prmx)&&*prmauxy==*prmy)){
+						if(((/*cond1*/*prmauxy-1==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond2*/*prmauxy-2==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond3*/*prmauxy-3==*prmy&&(*prmauxx+12==*prmx||*prmauxx-12==*prmx)) || (/*cond4*/*prmauxy-4==*prmy&&(*prmauxx+16==*prmx||*prmauxx-16==*prmx)) || (/*cond5*/*prmauxy-5==*prmy&&(*prmauxx+20==*prmx||*prmauxx-20==*prmx)) || (/*cond6*/*prmauxy+1==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond7*/*prmauxy+2==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond8*/*prmauxy+3==*prmy&&(*prmauxx+12==*prmx||*prmauxx-12==*prmx)) || (/*cond9*/*prmauxy+4==*prmy&&(*prmauxx+16==*prmx||*prmauxx-16==*prmx)) || (/*cond10*/*prmauxy+5==*prmy&&(*prmauxx+20==*prmx||*prmauxx-20==*prmx)) || (/*cond11*/(*prmauxy-1==*prmy||*prmauxy-2==*prmy||*prmauxy-3==*prmy||*prmauxy-4==*prmy||*prmauxy-5==*prmy||*prmauxy-6==*prmy||*prmauxy-7==*prmy)&&*prmauxx==*prmx) || (/*cond12*/(*prmauxx-4==*prmx||*prmauxx-8==*prmx||*prmauxx-12==*prmx||*prmauxx-16==*prmx||*prmauxx-20==*prmx||*prmauxx-24==*prmx||*prmauxx-28==*prmx)&&*prmauxy==*prmy)||((*prmauxy+1==*prmy||*prmauxy+2==*prmy||*prmauxy+3==*prmy||*prmauxy+4==*prmy||*prmauxy+5==*prmy||*prmauxy+6==*prmy||*prmauxy+7==*prmy)&&*prmauxx==*prmx)||((*prmauxx+4==*prmx||*prmauxx+8==*prmx||*prmauxx+12==*prmx||*prmauxy+16==*prmx||*prmauxx+20==*prmx||*prmauxx+24==*prmx||*prmauxx+28==*prmx)&&*prmauxy==*prmy))&&varEsLibre){
 							goto parte3;
 						}else{
 							goto parte2;
 						}
 						break;
 					case 'r':
-						if((/*cond1*/*prmauxy-1==*prmy&&*prmauxx==*prmx) || (/*cond2*/*prmauxy-1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-4)) || (/*cond3*/*prmauxy+1==*prmy&&*prmauxx==*prmx) || (/*cond4*/*prmauxy+1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-4)) || (/*cond5*/*prmauxy==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-4))){
+						if(((/*cond1*/*prmauxy-1==*prmy&&*prmauxx==*prmx) || (/*cond2*/*prmauxy-1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-4)) || (/*cond3*/*prmauxy+1==*prmy&&*prmauxx==*prmx) || (/*cond4*/*prmauxy+1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-4)) || (/*cond5*/*prmauxy==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-4)))&&varEsLibre){
 							goto parte3;
 						}else{
 							goto parte2;
 						}
 						break;
 					case 'p':
-						if(((*prmauxy-1==*prmy&&*prmauxx==*prmx)||(*prmauxy-1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-3))&&(prmJugador[0]=='1'))||((*prmauxy+1==*prmy&&*prmauxx==*prmx)||(*prmauxy+1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-3))&&(prmJugador[0]=='2'))){
+						if((((*prmauxy-1==*prmy&&*prmauxx==*prmx)||(*prmauxy-1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-3))&&(prmJugador[0]=='1'))||((*prmauxy+1==*prmy&&*prmauxx==*prmx)||(*prmauxy+1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-3))&&(prmJugador[0]=='2')))&&varEsLibre){
 							goto parte3;
 						}
 						else{
@@ -501,6 +497,45 @@ void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int
 			}
 		}
 	}
+}
+bool validarLibre(int actux, int actuy, int nuevx, int nuevy,char ficha){//Función para validar que el camino de la ficha este libre
+	bool varEstado;int varIterador,varAux;varAux=0;varEstado=true;
+	if(ficha!='a'){
+		if(actux==nuevx){//Se mueve por eje y
+			if(actuy<nuevy){//se mueve hacia abajo
+				for(varIterador=actuy;varIterador<=(nuevy-1);varIterador++){
+					if(mesa[varIterador][actux]!=' '){
+						varAux=varAux+1;
+					}
+				}
+			}else{//se mueve hacia arriba
+				for(varIterador=actuy;varIterador>=(nuevy+1);varIterador--){
+					if(mesa[varIterador][actux]!=' '){
+						varAux=varAux+1;
+					}
+				}
+			}
+		}else{//Se mueve por eje x
+			if(actux<nuevx){//se mueve hacia la izquierda
+				for(varIterador=actux;varIterador<=(nuevx-4);varIterador=varIterador+4){
+					if(mesa[actuy][varIterador]!=' '){
+						varAux=varAux+1;
+					}
+				}
+			}else{//se mueve hacia la derecha
+				for(varIterador=actux;varIterador>=(nuevx+4);varIterador=varIterador-4){
+					if(mesa[actuy][varIterador]!=' '){
+						varAux=varAux+1;
+					}
+				}
+			}
+		}
+	}
+	
+	if(varAux!=0){
+		varEstado=false;
+	}
+	return varEstado;
 }
 void guardar(){
 	int aux,aux2;aux=0;aux2=0;
