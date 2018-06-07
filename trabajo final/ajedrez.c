@@ -45,7 +45,6 @@ typedef struct{//Estructura para facilitar la declaración de los FILE
 	char lectoEscritura[100];
 }ficheros;
 int main(){//función principal
-	inicializarVar();//rediracción a la inicialización de variables
 	setlocale(LC_CTYPE,"Spanish");//Manejo local para que la consola imprima ñ y tildes
 	reproMenu();//Redirección a la ejecución del menu
 }
@@ -114,6 +113,7 @@ void reproMenu(){//función para ejecutar el menu principal
 				varOpcion++;}
 			rewind(juegos);//devuelvo a la posición 0 del txt
 			vaciar(temp.lectoEscritura);
+			inicializarVar();//rediracción a la inicialización de variables
 			fprintf(juegos,"\n");fprintf(juegos,"%i",varOpcion);fprintf(juegos,")\t");//crea el espacio de la nueva partida
 			for (varOpcion=0;varOpcion<2;varOpcion++){//leer nombre de los jugadores
 				printf("ingresa el nombre del jugador %i\n",varOpcion+1);
@@ -127,8 +127,10 @@ void reproMenu(){//función para ejecutar el menu principal
 					validar_mover("1(blanca)",varJugador1);
 					}
 				else{
-					validar_mover("2(negra)",varJugador2);}
-					}while(varPartida);
+					validar_mover("2(negra)",varJugador2);
+				}
+				varJugador=!varJugador;//cambio de estado para permitir el cambio de jugador
+			}while(varPartida);
 			varPartida=true;
 			goto secMenu;
 			break;
@@ -181,7 +183,7 @@ void inicializarVar(){//función para inicializar todas la variables
 	strcat(varJugador2,"");
 	int varOpcion;
 	//Crear estado base para el tablero
-	strcat(mesa[0],"[tn][cn][an][rn][dn][an][cn][tn]8");
+	strcat(mesa[0],"[tn][cn][an][dn][rn][an][cn][tn]8");
 	strcat(mesa[1],"[pn][pn][pn][pn][pn][pn][pn][pn]7");
 	for (varOpcion=2;varOpcion<=5;varOpcion++){ //"para" que permite ahorrar lineas de codigo en la inicialización de las casillas vacias
 		strcat(mesa[varOpcion],"[  ][  ][  ][  ][  ][  ][  ][  ]");
@@ -239,7 +241,6 @@ void validar_mover(char prmColor[],char prmJugador[4]){//función para empezar mo
 	}
 	else{
 		mover(prmJugador,prmColor);//Redirección a la función para realizar el movimiento
-		varJugador=!varJugador;//cambio de estado para permitir el cambio de jugador
 	}
 }
 void mover(char *prmJugador,char prmColor[]){//función para validar el movimiento
@@ -262,19 +263,12 @@ void mover(char *prmJugador,char prmColor[]){//función para validar el movimient
 			case 0:
 				printf("Guardando juego\n");
 				guardar();
-				fprintf(juegos,"Juego guardado");
 				break;
 			case 1:
 				printf("cancelando juego");
-				fprintf(juegos,"Juego cancelado");
 				break;
 			case 2:
 				printf("Se ha rendido el jugador %s",prmColor);
-				if(prmColor[0]=='1'){
-					fprintf(juegos,"gana j2");
-				}else{
-					fprintf(juegos,"gana j1");
-				}
 				printf("\n\ningresa cualquier valor diferente a %i para salir\n",varOpcion);
 				do{
 					scanf("%i",&varOpcion);
@@ -320,20 +314,12 @@ void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int
 			case 0:
 				printf("Guardando juego\n");
 				guardar();
-				fprintf(juegos,"Juego guardado");
 				break;
 			case 1:
 				printf("cancelando juego");
-				fprintf(juegos,"Juego cancelado");
 				break;
 			case 2:
 				printf("Se ha rendido el jugador %s",prmColor);
-				if(prmColor[0]=='1'){
-					fprintf(juegos,"gana j2");
-				}else{
-					fprintf(juegos,"gana j1");
-				}
-				printf("\n\ningresa cualquier valor diferente a %i para salir\n",varOpcion);
 				do{
 					scanf("%i",&varOpcion);
 				}while(varOpcion==2);
@@ -419,42 +405,78 @@ void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int
 				printf("número no valido\n");
 				break;
 		}
-		if((varJugador&&mesa[*prmy][*prmx+1]=='n')||(!varJugador&&mesa[*prmy][*prmx+1]=='b') ){
-			goto parte2;
-		}
-		if(!prmMov){
-			switch(aux[0]){
-				case 'a':
-					
-					break;
-				case 'c':
-					
-					break;
-				case 't':
-					
-					break;
-				case 'd':
-					
-					break;
-				case 'r':
-					
-					break;
-				case 'p':
-					if(((*prmauxy-1==*prmy&&*prmauxx==*prmx)||(*prmauxy-1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-3))&&(prmJugador[0]=='1'))||((*prmauxy+1==*prmy&&*prmauxx==*prmx)||(*prmauxy+1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-3))&&(prmJugador[0]=='2'))){
-						goto parte3;
-					}
-					else{
-						goto parte2;
-					}
-					break;
-				default:
-					break;
+		if((varJugador&&mesa[*prmy][*prmx+1]=='n')||(!varJugador&&mesa[*prmy][*prmx+1]=='b')){
+			if(!prmEsValido){
+				if((mesa[*prmy][*prmx+1]==mesa[*prmauxy][*prmauxx+1])&&(*prmauxy==-1||*prmauxx==-1)){
+					goto parte2;
+				}
+			}
+			else{
+				goto conti;
 			}
 		}
-		if(*prmx==-1||*prmy==-1||((mesa[*prmy][*prmx]==' ')*prmMov)||((mesa[*prmy][*prmx]!=' ')*(!prmMov))){
+		conti:
+		if(aux[1]==mesa[*prmy][*prmx+1]){
+			goto parte2;
+		}
+		else{
+			if(!prmMov){
+				switch(aux[0]){
+					case 'a':
+						if((/*cond1*/*prmauxy-1==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond2*/*prmauxy-2==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond3*/*prmauxy-3==*prmy&&(*prmauxx+12==*prmx||*prmauxx-12==*prmx)) || (/*cond4*/*prmauxy-4==*prmy&&(*prmauxx+16==*prmx||*prmauxx-16==*prmx)) || (/*cond5*/*prmauxy-5==*prmy&&(*prmauxx+20==*prmx||*prmauxx-20==*prmx)) || (/*cond6*/*prmauxy+1==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond7*/*prmauxy+2==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond8*/*prmauxy+3==*prmy&&(*prmauxx+12==*prmx||*prmauxx-12==*prmx)) || (/*cond9*/*prmauxy+4==*prmy&&(*prmauxx+16==*prmx||*prmauxx-16==*prmx)) || (/*cond10*/*prmauxy+5==*prmy&&(*prmauxx+20==*prmx||*prmauxx-20==*prmx))){
+							goto parte3;
+						}
+						else{
+							goto parte2;
+						}
+						break;
+					case 'c':
+						if( (/*cond1*/*prmauxy-2==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond2*/*prmauxy-1==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond3*/*prmauxy+2==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond4*/*prmauxy+1==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) ){
+							goto parte3;
+						}
+						else{
+							goto parte2;
+						}
+						break;
+					case 't':
+						if((/*cond1*/(*prmauxy-1==*prmy||*prmauxy-2==*prmy||*prmauxy-3==*prmy||*prmauxy-4==*prmy||*prmauxy-5==*prmy||*prmauxy-6==*prmy||*prmauxy-7==*prmy)&&*prmauxx==*prmx) || (/*cond2*/(*prmauxx-4==*prmx||*prmauxx-8==*prmx||*prmauxx-12==*prmx||*prmauxx-16==*prmx||*prmauxx-20==*prmx||*prmauxx-24==*prmx||*prmauxx-28==*prmx)&&*prmauxy==*prmy)||((*prmauxy+1==*prmy||*prmauxy+2==*prmy||*prmauxy+3==*prmy||*prmauxy+4==*prmy||*prmauxy+5==*prmy||*prmauxy+6==*prmy||*prmauxy+7==*prmy)&&*prmauxx==*prmx)||((*prmauxx+4==*prmx||*prmauxx+8==*prmx||*prmauxx+12==*prmx||*prmauxy+16==*prmx||*prmauxx+20==*prmx||*prmauxx+24==*prmx||*prmauxx+28==*prmx)&&*prmauxy==*prmy)){
+							goto parte3;
+						}
+						else{
+							goto parte2;
+						}
+						break;
+					case 'd':
+						if((/*cond1*/*prmauxy-1==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond2*/*prmauxy-2==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond3*/*prmauxy-3==*prmy&&(*prmauxx+12==*prmx||*prmauxx-12==*prmx)) || (/*cond4*/*prmauxy-4==*prmy&&(*prmauxx+16==*prmx||*prmauxx-16==*prmx)) || (/*cond5*/*prmauxy-5==*prmy&&(*prmauxx+20==*prmx||*prmauxx-20==*prmx)) || (/*cond6*/*prmauxy+1==*prmy&&(*prmauxx+4==*prmx||*prmauxx-4==*prmx)) || (/*cond7*/*prmauxy+2==*prmy&&(*prmauxx+8==*prmx||*prmauxx-8==*prmx)) || (/*cond8*/*prmauxy+3==*prmy&&(*prmauxx+12==*prmx||*prmauxx-12==*prmx)) || (/*cond9*/*prmauxy+4==*prmy&&(*prmauxx+16==*prmx||*prmauxx-16==*prmx)) || (/*cond10*/*prmauxy+5==*prmy&&(*prmauxx+20==*prmx||*prmauxx-20==*prmx)) || (/*cond11*/(*prmauxy-1==*prmy||*prmauxy-2==*prmy||*prmauxy-3==*prmy||*prmauxy-4==*prmy||*prmauxy-5==*prmy||*prmauxy-6==*prmy||*prmauxy-7==*prmy)&&*prmauxx==*prmx) || (/*cond12*/(*prmauxx-4==*prmx||*prmauxx-8==*prmx||*prmauxx-12==*prmx||*prmauxx-16==*prmx||*prmauxx-20==*prmx||*prmauxx-24==*prmx||*prmauxx-28==*prmx)&&*prmauxy==*prmy)||((*prmauxy+1==*prmy||*prmauxy+2==*prmy||*prmauxy+3==*prmy||*prmauxy+4==*prmy||*prmauxy+5==*prmy||*prmauxy+6==*prmy||*prmauxy+7==*prmy)&&*prmauxx==*prmx)||((*prmauxx+4==*prmx||*prmauxx+8==*prmx||*prmauxx+12==*prmx||*prmauxy+16==*prmx||*prmauxx+20==*prmx||*prmauxx+24==*prmx||*prmauxx+28==*prmx)&&*prmauxy==*prmy)){
+							goto parte3;
+						}else{
+							goto parte2;
+						}
+						break;
+					case 'r':
+						if((/*cond1*/*prmauxy-1==*prmy&&*prmauxx==*prmx) || (/*cond2*/*prmauxy-1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-4)) || (/*cond3*/*prmauxy+1==*prmy&&*prmauxx==*prmx) || (/*cond4*/*prmauxy+1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-4)) || (/*cond5*/*prmauxy==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-4))){
+							goto parte3;
+						}else{
+							goto parte2;
+						}
+						break;
+					case 'p':
+						if(((*prmauxy-1==*prmy&&*prmauxx==*prmx)||(*prmauxy-1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-3))&&(prmJugador[0]=='1'))||((*prmauxy+1==*prmy&&*prmauxx==*prmx)||(*prmauxy+1==*prmy&&(*prmauxx==*prmx+4||*prmauxx==*prmx-3))&&(prmJugador[0]=='2'))){
+							goto parte3;
+						}
+						else{
+							goto parte2;
+						}
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		if(*prmx==-1||*prmy==-1 || ((mesa[*prmy][*prmx]==' ')*prmMov)){
 			parte2:
 			printf("Selecciona una opción valida\n");
-			if ((!prmEsValido&&prmJugador[0]=='1')||(prmEsValido&&prmJugador[0]=='2')){
+			if(prmEsValido){
 				mesa[*prmauxy][*prmauxx]=aux[0];
 				mesa[*prmauxy][*prmauxx+1]=aux[1];
 			}
@@ -468,6 +490,10 @@ void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int
 		}
 		else{
 			parte3:
+			if(!prmEsValido){
+				*prmauxy=-1;
+				*prmauxx=-1;
+			}
 			if(prmMov){
 				*prmEsValido=true;
 				*prmauxx=*prmx;
