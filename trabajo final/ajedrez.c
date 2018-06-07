@@ -286,7 +286,7 @@ void mover(char *prmJugador,char prmColor[]){//función para validar el movimient
 	}
 	else{
 		ubicacion(prmJugador,&varx,&varY,true,&auxx,&auxy,&varEsValido,prmColor);//confirmación de la ubicación de la ficha
-		printf("Haz elejido el %c%c\n",mesa[varY][varx],mesa[varY][varx+1]);
+		printf("Has elegido el %c%c\n",mesa[varY][varx],mesa[varY][varx+1]);
 		varAux[0]=mesa[varY][varx];varAux[1]=mesa[varY][varx+1];//creación de copia de la variable en caso de selección final invalida
 		printf("Elije en donde quieres poner la ficha\n");
 		scanf("%s",prmJugador);
@@ -406,9 +406,8 @@ void ubicacion(char *prmJugador,int *prmx,int *prmy,bool prmMov,int *prmauxx,int
 				printf("número no valido\n");
 				break;
 		}
-		
 		if((varJugador&&mesa[*prmy][*prmx+1]=='n')||(!varJugador&&mesa[*prmy][*prmx+1]=='b')){
-					goto parte2;
+			goto parte2;
 		}
 		conti:
 		if(aux[1]==mesa[*prmy][*prmx+1]){
